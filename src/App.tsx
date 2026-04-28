@@ -5,6 +5,7 @@ import ErrorMessage from "./components/ErrorMessage";
 import Search from "./components/Search";
 import type { Movie } from "./interfaces";
 import MovieCard from "./components/MovieCard";
+import { getTrendingMovies, updateSearchCount } from "./appwrite";
 
 function App() {
   const BASE_URL = "https://api.themoviedb.org/3";
@@ -15,6 +16,7 @@ function App() {
   const [moviesList, setMoviesList] = useState<Movie[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [trendingMovies, setTrendingMovies] = useState([]);
 
   useDebounce(() => setDebouncedSearchQuery(searchQuery), 500, [searchQuery]);
 
@@ -36,7 +38,9 @@ function App() {
 
       const data = await response.json();
       setMoviesList(data.results || []);
-      console.log(data);
+      if (searchQuery && data.results.length > 0) {
+        await updateSearchCount(searchQuery, data.results[0]);
+      }
     } catch (error) {
       setErrorMessage("Error fetching movies");
     } finally {
@@ -44,9 +48,18 @@ function App() {
     }
   };
 
+  const loadTrendingMovies = async () => {
+    const trendingMovies = await getTrendingMovies();
+    setTrendingMovies(trendingMovies);
+  };
+
   useEffect(() => {
     fetchMovies();
   }, [debouncedSearchQuery]);
+
+  useEffect(() => {
+    loadTrendingMovies();
+  }, []);
 
   return (
     <main>
@@ -62,6 +75,21 @@ function App() {
 
           <Search query={searchQuery} setQuery={setSearchQuery} />
         </header>
+
+        {trendingMovies.length > 0 && (
+          <section className="trending">
+            <h2>Trending Movies</h2>
+
+            <ul>
+              {trendingMovies.map((movie, index) => (
+                <li key={movie.$id}>
+                  <p>{index + 1}</p>
+                  <img src={movie.posterPath} alt={movie.title} />
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         <section className="all-movies">
           <h2>All Movies</h2>
