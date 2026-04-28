@@ -17,3 +17,5 @@ npm run dev
 
 Build with ❤️ by
 [San Linn Phyo](https://github.com/devsanlphyo)
+
+Followed the tutorial of [JSMasteryPro](https://youtu.be/8vIDZO_w7lY?si=cBB88UJliiqsgTL2) and added some features by myself.
