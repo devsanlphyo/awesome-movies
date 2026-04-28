@@ -3,24 +3,8 @@ import { useDebounce } from "react-use";
 import Spinner from "./components/Spinner";
 import ErrorMessage from "./components/ErrorMessage";
 import Search from "./components/Search";
-
-interface Movie {
-  adult: boolean;
-  backdrop_path: string;
-  genre_ids: [];
-  id: number;
-  title: string;
-  original_language: string;
-  original_title: string;
-  overview: string;
-  popularity: number;
-  poster_path: string;
-  release_date: string;
-  softcore: boolean;
-  video: boolean;
-  vote_average: number;
-  vote_count: number;
-}
+import type { Movie } from "./interfaces";
+import MovieCard from "./components/MovieCard";
 
 function App() {
   const BASE_URL = "https://api.themoviedb.org/3";
@@ -32,7 +16,7 @@ function App() {
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
-  useDebounce(() => setDebouncedSearchQuery(searchQuery), 2000, [searchQuery]);
+  useDebounce(() => setDebouncedSearchQuery(searchQuery), 500, [searchQuery]);
 
   const fetchMovies = async () => {
     try {
@@ -86,11 +70,13 @@ function App() {
           ) : errorMessage ? (
             <ErrorMessage message={errorMessage} />
           ) : (
-            moviesList.map((movie) => (
-              <div className="text-white" key={movie.id}>
-                <span>{movie.title}</span>
-              </div>
-            ))
+            <ul>
+              {moviesList.map((movie) => (
+                <li key={movie.id}>
+                  <MovieCard movie={movie} />
+                </li>
+              ))}
+            </ul>
           )}
         </section>
       </div>
